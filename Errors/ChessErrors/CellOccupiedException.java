@@ -1,7 +1,7 @@
 package ChessErrors;
 
 public class CellOccupiedException extends Exception {
-    ChessErrors instance;
+    private final ChessErrors instance;
 
     public CellOccupiedException(Throwable e) {
         super(e);
