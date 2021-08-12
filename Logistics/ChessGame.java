@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChessGame extends JFrame {
-//    private JComponent board;                   // Chess board
+//    private JComponent board;                             // Chess board
     private ChessBoard chessboard;                          // chess board
     private Map<String, Map<Integer, Piece>> pieces;        // Map of suit -> position -> piece
-    private boolean toMove = true;                          // Whose turn? true = white, false = black
+    private final boolean toMove = true;                    // Whose turn? true = white, false = black
 
     public ChessGame()  {
         // Initialize JFrame
@@ -33,11 +33,6 @@ public class ChessGame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
-
-
-
-
-
         // Initialize Pieces and Board
         initPieces();
         this.chessboard = new ChessBoard();
@@ -92,13 +87,6 @@ public class ChessGame extends JFrame {
 
     }
 
-
-
-
-
-
-
-
     /**
      * Given a Point in real coordinates, return the cell of the point
      * @param point point to check
@@ -129,20 +117,18 @@ public class ChessGame extends JFrame {
         for (int rank=1; rank<=8; rank++) {
             Map<Integer, Piece> currentPieces = null;
             String suit = "null";
-            if (rank == 1 || rank == 2) {
-                suit = "white";
-                currentPieces = white;
-            }
-            else if (rank == 7 || rank == 8) {
-                suit = "black";
-                currentPieces = black;
-            }
-
-            try {
-                if (!suit.equals("null")) {
+            if (rank == 1 || rank == 2 || rank == 7 || rank == 8) {
+                if (rank <= 2) {
+                    suit = "white";
+                    currentPieces = white;
+                }
+                else {
+                    suit = "black";
+                    currentPieces = black;
+                }
+                try {
                     for (int row=1; row<=8; row++) {
                         int coordinate = ChessLib.refToInt(row, rank);
-
                         if (rank == 2 || rank == 7) {
                             currentPieces.put(coordinate, new Pawn(suit, new Point(row, rank), this));
                         }
@@ -165,10 +151,12 @@ public class ChessGame extends JFrame {
                         }
                     }
                 }
+                catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
             }
-            catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+
+
         }
         System.out.println("INITIALIZATION DONE!!");
         for (String suit : this.pieces.keySet()) {

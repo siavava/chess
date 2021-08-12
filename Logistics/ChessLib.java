@@ -20,12 +20,12 @@ public class ChessLib {
 
     /**
      * Static Method to convert a reference (row and rank) to int
-     * @param row Row -> x var
+     * @param file File -> x var
      * @param rank Rank -> y var
      * @return int depending on x and y
      */
-    public static int refToInt(int row, int rank) {
-        return (8 * (rank-1) + row);
+    public static int refToInt(int file, int rank) {
+        return (8 * (rank-1) + file);
     }
 
     public static Point realToRef(Point p) {
@@ -65,3 +65,5 @@ public class ChessLib {
         return bool? 1: 0;
     }
 }
+
+

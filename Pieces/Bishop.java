@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Bishop extends PieceAbstract {
-
-
     public Bishop(String suit, Point position, ChessGame chessgame) throws IOException {
         super('B', suit, position, chessgame);
 
@@ -19,7 +17,7 @@ public class Bishop extends PieceAbstract {
     }
 
     public String getImageFile() {
-        if (this.suit == PieceAbstract.Suit.WHITE) {
+        if (this.suit.equals(Suit.WHITE)) {
             return "./img/B-white.png";
         }
         else {

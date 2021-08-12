@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -7,13 +9,16 @@ import java.util.List;
 
 public abstract class PieceAbstract implements Piece {
 
-    Point position;                     // Track square with Piece
-    Suit  suit;                         // Black or White
+    private boolean isActive = false;   // track if piece is active on board
     private final String id;            // Identifier
+
+    protected Suit suit;                // Suit
     protected BufferedImage image;      // Visual representation of Piece
     protected double value;             // value of Piece
     protected ChessGame chessgame;      // current game instance
-    List<Integer> posMoves;             // List of possible moves
+
+    public Point position;              // piece position on board
+    public List<Integer> posMoves;      // List of possible moves
 
     /**
      * BLACK or WHITE
@@ -27,22 +32,22 @@ public abstract class PieceAbstract implements Piece {
      * Constructor with name, suit, position
      * @param name K, Q, R, B, N, P
      * @param suit white or black
-     * @param point current position square
+     * @param position current position square
      * @throws IOException Error loading piece image
      */
-    public PieceAbstract(char name, String suit, Point point, ChessGame chessgame) throws IOException {
+    public PieceAbstract(char name, String suit, Point position, ChessGame chessgame) throws IOException {
 
         // Set Suit
-        switch (suit) {
-            case "white": this.suit = Suit.WHITE;
-            case "black": this.suit = Suit.BLACK;
-        }
+        this.suit = switch (suit) {
+            case "black" -> Suit.BLACK;
+            default -> Suit.WHITE;
+        };
 
         // Set Point (row and rank)
-        this.position = point;
+        this.position = position;
 
         // Set ID
-        id = name +" @ " + position.getX() + " , " + position.getY();
+        id = name +" @ " + this.position.getX() + " , " + this.position.getY();
 
         // Set image
         this.setImage();
@@ -71,7 +76,7 @@ public abstract class PieceAbstract implements Piece {
     public void setImage() throws IOException {
         String filename = this.getImageFile();
         try {
-            image = ImageIO.read(new File((filename)));
+            this.image = ImageIO.read(new File((filename)));
         }
         catch(IOException e) {
             System.err.println(e.getMessage());
@@ -80,12 +85,11 @@ public abstract class PieceAbstract implements Piece {
         }
     }
 
-//    public Point getCoordinates() {
-//        int x = (int) (position.getX() - 1) * ChessBoard.STEP + ChessBoard.STEP/5;
-//        int y = (int) (Math.abs(position.getY() - 8)) * ChessBoard.STEP + ChessBoard.STEP/5;
-//
-//        return new Point(x, y);
-//    }
+    public boolean isActive() {
+        return this.isActive;
+    }
+
+//    public abstract boolean canMove(ChessBoard board, )
 
     public String toString() {
         return id;
@@ -104,8 +108,7 @@ public abstract class PieceAbstract implements Piece {
     public abstract List<Move> getMoves();
 
     @Override
-    public void draw(Graphics g) {
-//        Point currentPos = getCoordinates();
+    public void draw(@NotNull Graphics g) {
         Point currentPos = ChessLib.refToReal(position);
         int px = (int) currentPos.getX() + ChessBoard.STEP/5;
         int py = (int) currentPos.getY() + ChessBoard.STEP/5;
@@ -114,8 +117,8 @@ public abstract class PieceAbstract implements Piece {
     }
 
     public List<Integer> getPosMoves() {
-        assert posMoves != null;
-        return posMoves;
+        assert this.posMoves != null;
+        return this.posMoves;
     }
 
     public String getSuit() {
