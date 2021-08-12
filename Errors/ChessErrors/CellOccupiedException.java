@@ -8,6 +8,7 @@ public class CellOccupiedException extends Exception {
         this.instance = ChessErrors.OCCUPIED_CELL;
     }
 
+    @Override
     public String toString() {
         return instance.toString();
     }
