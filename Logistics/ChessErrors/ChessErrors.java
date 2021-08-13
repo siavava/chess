@@ -1,27 +1,29 @@
 package ChessErrors;
 
-public enum ChessErrors {
-    OCCUPIED_CELL(0, "The cell is occupied."),
-    INVALID_MOVEMENT(1, "The movement is invalid");
+import java.io.Serializable;
 
-    private final int code;
-    private final String description;
+public enum ChessErrors implements Serializable {
+    OCCUPIED_CELL(0, "The cell is occupied."),
+    ILLEGAL_MOVE(1, "The movement is invalid");
+
+    private transient final int errCode;
+    private transient final String description;
 
     ChessErrors(int code, String description) {
-        this.code = code;
+        this.errCode = code;
         this.description = description;
     }
 
     public int getErrorCode() {
-        return this.code;
+        return this.errCode;
     }
 
-    public String getDescription() {
+    public String getMessage() {
         return this.description;
     }
 
     @Override
     public String toString() {
-        return code + ": " + description;
+        return errCode + ": " + description;
     }
 }

@@ -1,9 +1,15 @@
+
+/* language dependencies */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+
+/* local dependencies */
+import ChessLib.*;
+import Pieces.*;
 
 public class ChessGame extends JFrame {
 //    private JComponent board;                             // Chess board
@@ -44,10 +50,13 @@ public class ChessGame extends JFrame {
      */
     private JComponent setupBoard() {
         JComponent board = new JComponent() {
+
+            @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 draw(g);
             }
+
         };
 
         int width = ChessBoard.SIZE;
@@ -56,16 +65,21 @@ public class ChessGame extends JFrame {
         board.setPreferredSize(new Dimension(width, height));
 
         board.addMouseListener(new MouseAdapter() {
+
+            @Override
             public void mousePressed(MouseEvent event) {
                 handlePress(event.getPoint());
             }
 
+            @Override
             public void mouseReleased(MouseEvent event) {
                 handleRelease();
             }
+
         });
 
         board.addMouseMotionListener(new MouseAdapter() {
+            @Override
             public void mouseDragged(MouseEvent event) {
                 handleDrag(event.getPoint());
             }
@@ -130,23 +144,23 @@ public class ChessGame extends JFrame {
                     for (int row=1; row<=8; row++) {
                         int coordinate = ChessLib.refToInt(row, rank);
                         if (rank == 2 || rank == 7) {
-                            currentPieces.put(coordinate, new Pawn(suit, new Point(row, rank), this));
+                            currentPieces.put(coordinate, new Pawn(suit, new Point(row, rank)));
                         }
                         else {
                             if (row == 1 || row == 8) {
-                                currentPieces.put(coordinate, new Rook(suit, new Point(row, rank), this));
+                                currentPieces.put(coordinate, new Rook(suit, new Point(row, rank)));
                             }
                             if (row == 2 || row == 7) {
-                                currentPieces.put(coordinate, new Knight(suit, new Point(row, rank), this));
+                                currentPieces.put(coordinate, new Knight(suit, new Point(row, rank)));
                             }
                             if (row == 3 || row == 6) {
-                                currentPieces.put(coordinate, new Bishop(suit, new Point(row, rank), this));
+                                currentPieces.put(coordinate, new Bishop(suit, new Point(row, rank)));
                             }
                             if (row == 4) {
-                                currentPieces.put(coordinate, new Queen(suit, new Point(row, rank), this));
+                                currentPieces.put(coordinate, new Queen(suit, new Point(row, rank)));
                             }
                             if (row == 5) {
-                                currentPieces.put(coordinate, new King(suit, new Point(row, rank), this));
+                                currentPieces.put(coordinate, new King(suit, new Point(row, rank)));
                             }
                         }
                     }

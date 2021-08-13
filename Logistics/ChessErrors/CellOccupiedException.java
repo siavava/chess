@@ -12,4 +12,9 @@ public class CellOccupiedException extends Exception {
     public String toString() {
         return instance.toString();
     }
+
+    @Override
+    public String getMessage() {
+        return instance.getMessage();
+    }
 }
