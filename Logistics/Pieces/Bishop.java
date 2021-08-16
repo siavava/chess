@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class Bishop extends PieceAbstract {
-    public Bishop(String suit, Point position) throws IOException {
+public class Bishop extends AbstractPiece {
+    public Bishop(Suit suit, Point position) throws IOException {
         super('B', suit, position);
 
         // Initialize move behavior

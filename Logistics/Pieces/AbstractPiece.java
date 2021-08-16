@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class PieceAbstract implements Piece {
+public abstract class AbstractPiece implements Piece {
 
     private boolean isActive = false;   // track if piece is active on board
     private final String id;            // Identifier
@@ -29,21 +29,21 @@ public abstract class PieceAbstract implements Piece {
 
     /**
      * Constructor with name, suit, position
-     * @param name K, Q, R, B, N, P
+     * @param type K, Q, R, B, N, P
      * @param suit white or black
      * @param position current position square
      * @throws IOException Error loading piece image
      */
-    public PieceAbstract(char name, String suit, Point position) throws IOException {
+    public AbstractPiece(char type, Suit suit, Point position) throws IOException {
 
         // Set Suit
-        this.suit = suit.equals("black") ? Suit.BLACK : Suit.WHITE;
+        this.suit = suit;
 
         // Set Point (row and rank)
         this.position = position;
 
         // Set ID
-        id = name +" @ " + this.position.getX() + " , " + this.position.getY();
+        id = type +" @ " + this.position.getX() + " , " + this.position.getY();
 
         // Set image
         this.setImage();

@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class Knight extends PieceAbstract {
+public class Knight extends AbstractPiece {
 
-    public Knight(String suit, Point position) throws IOException {
+    public Knight(Suit suit, Point position) throws IOException {
         super('N', suit, position);
 
         // Initialize move behavior
@@ -20,7 +20,7 @@ public class Knight extends PieceAbstract {
     }
 
     public String getImageFile() {
-        if (this.suit == PieceAbstract.Suit.WHITE) {
+        if (this.suit == Suit.WHITE) {
             return "./img/N-white.png";
         }
         else {

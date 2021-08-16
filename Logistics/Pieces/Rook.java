@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class Rook extends PieceAbstract {
+public class Rook extends AbstractPiece {
 
-    public Rook(String suit, Point position) throws IOException {
+    public Rook(Suit suit, Point position) throws IOException {
         super('R', suit, position);
 
         // Initialize move behavior
@@ -20,7 +20,7 @@ public class Rook extends PieceAbstract {
     }
 
     public String getImageFile() {
-        if (this.suit == PieceAbstract.Suit.WHITE) {
+        if (this.suit == Suit.WHITE) {
             return "./img/R-white.png";
         }
         else {

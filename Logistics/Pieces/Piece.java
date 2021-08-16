@@ -10,9 +10,7 @@ import java.util.List;
  */
 public interface Piece {
 
-    /**
-     * BLACK or WHITE
-     */
+    /** BLACK or WHITE */
     enum Suit {
         WHITE,
         BLACK

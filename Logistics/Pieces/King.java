@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class King extends PieceAbstract {
+public class King extends AbstractPiece {
 
-    public King(String suit, Point position) throws IOException {
+    public King(Suit suit, Point position) throws IOException {
         super('K', suit, position);
 
         // Initialize move behavior

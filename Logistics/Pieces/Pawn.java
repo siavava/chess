@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Pawn extends PieceAbstract {
+public class Pawn extends AbstractPiece {
 
-    public Pawn(String suit, Point position) throws IOException {
+    public Pawn(Suit suit, Point position) throws IOException {
         super('P', suit, position);
 
         // Initialize move behavior
@@ -22,7 +22,7 @@ public class Pawn extends PieceAbstract {
     }
 
     public String getImageFile() {
-        if (this.suit == PieceAbstract.Suit.WHITE) {
+        if (this.suit == Suit.WHITE) {
             return "./img/P-white.png";
         }
         else {

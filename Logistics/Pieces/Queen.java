@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class Queen extends PieceAbstract{
+public class Queen extends AbstractPiece {
 
-    public Queen(String suit, Point position) throws IOException {
+    public Queen(Suit suit, Point position) throws IOException {
         super('Q', suit, position);
 
         // Initialize move behavior
@@ -21,7 +21,7 @@ public class Queen extends PieceAbstract{
     }
 
     public String getImageFile() {
-        if (this.suit == PieceAbstract.Suit.WHITE) {
+        if (this.suit == Suit.WHITE) {
             return "./img/Q-white.png";
         }
         else {

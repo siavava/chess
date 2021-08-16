@@ -4,18 +4,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /* local dependencies */
 import ChessLib.*;
 import Pieces.*;
+import Pieces.Piece.Suit;
+import org.jetbrains.annotations.NotNull;
 
 public class ChessGame extends JFrame {
 //    private JComponent board;                             // Chess board
     private ChessBoard chessboard;                          // chess board
-    private Map<String, Map<Integer, Piece>> pieces;        // Map of suit -> position -> piece
+    private Map<Suit, Map<Integer, Piece>> pieces;        // Map of suit -> position -> piece
     private final boolean toMove = true;                    // Whose turn? true = white, false = black
+
+    /* Remember captured pieces */
+    private Map<Suit, List<Piece>> capturedPieces;
 
     public ChessGame()  {
         // Initialize JFrame
@@ -50,7 +57,6 @@ public class ChessGame extends JFrame {
      */
     private JComponent setupBoard() {
         JComponent board = new JComponent() {
-
             @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -106,7 +112,7 @@ public class ChessGame extends JFrame {
      * @param point point to check
      * @return Point representing x and y of cell (1 to 8)
      */
-    private Point getCell(Point point) {
+    private Point getCell(@NotNull Point point) {
         double x = point.getX(), y = point.getY();
         double cellSize = (double) ChessBoard.SIZE / 8;
 
@@ -120,24 +126,29 @@ public class ChessGame extends JFrame {
      */
     private void initPieces() {
 
+        // initialize captured pieces
+        this.capturedPieces = new HashMap<>();
+        capturedPieces.put(Suit.WHITE, new ArrayList<>());
+        capturedPieces.put(Suit.BLACK, new ArrayList<>());
+
         // Initialize vars
         this.pieces = new HashMap<>();
         Map<Integer, Piece> white = new HashMap<>();
         Map<Integer, Piece> black = new HashMap<>();
-        pieces.put("white", white);
-        pieces.put("black", black);
+        pieces.put(Suit.WHITE, white);
+        pieces.put(Suit.BLACK, black);
 
         // Initialize pieces
         for (int rank=1; rank<=8; rank++) {
             Map<Integer, Piece> currentPieces = null;
-            String suit = "null";
+            Suit suit;
             if (rank == 1 || rank == 2 || rank == 7 || rank == 8) {
                 if (rank <= 2) {
-                    suit = "white";
+                    suit = Suit.WHITE;
                     currentPieces = white;
                 }
                 else {
-                    suit = "black";
+                    suit = Suit.BLACK;
                     currentPieces = black;
                 }
                 try {
