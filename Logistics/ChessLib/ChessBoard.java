@@ -11,10 +11,10 @@ import ChessErrors.*;
 import Pieces.*;
 
 public class ChessBoard {
-    public static final int SIZE = 800;
-    public static final int STEP = SIZE / 8;
-    public static final int dark = Color.GRAY.getRGB();
-    public static final int light = Color.PINK.getRGB();
+    public static final int BOARD_SIZE = 800;
+    public static final int CELL_SIZE = BOARD_SIZE / 8;
+    public static final int DARK_COLOR = Color.GRAY.getRGB();
+    public static final int LIGHT_COLOR = Color.PINK.getRGB();
 
     private final BufferedImage board;
     private final Map<Integer, Cell> cells;
@@ -30,7 +30,7 @@ public class ChessBoard {
             this.position = new Point(file, rank);
 
             boolean isLightSquare = (file + rank) % 2 != 0;
-            this.color = isLightSquare? new Color(light) : new Color(dark);
+            this.color = isLightSquare? new Color(LIGHT_COLOR) : new Color(DARK_COLOR);
         }
 
         public boolean hasOccupant() {
@@ -70,7 +70,7 @@ public class ChessBoard {
 
     public ChessBoard() {
         // Create image of chess board
-        board = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_ARGB);
+        board = new BufferedImage(BOARD_SIZE, BOARD_SIZE, BufferedImage.TYPE_INT_ARGB);
         this.cells = new HashMap<>();
 
         // Track x coordinate
@@ -82,7 +82,7 @@ public class ChessBoard {
             for (int rank=1; rank<=8; rank++) {
                 // Determine whether to color Black or white
                 boolean isLightSquare = (file + rank) % 2 != 0;
-                int color = isLightSquare? light: dark;
+                int color = isLightSquare? LIGHT_COLOR : DARK_COLOR;
 
                 cells.put(ChessLib.refToInt(file, rank), new Cell(this, file, rank));
 
@@ -92,8 +92,8 @@ public class ChessBoard {
                 int y = (int) currentDims.getY();
 
                 // Loop over each pixel in cell and set color.
-                for (int px = x; px < x+STEP; px++) {
-                    for (int py = y; py < y+STEP; py++) {
+                for (int px = x; px < x+ CELL_SIZE; px++) {
+                    for (int py = y; py < y+ CELL_SIZE; py++) {
                         try {
                             board.setRGB(px, py, color);
                         }
@@ -109,7 +109,7 @@ public class ChessBoard {
     }
 
     public boolean isInBoard(Point p) {
-        return 0<=p.getX() && p.getX()< SIZE && 0 <= p.getY() && p.getY() < SIZE;
+        return 0<=p.getX() && p.getX()< BOARD_SIZE && 0 <= p.getY() && p.getY() < BOARD_SIZE;
     }
 
     /**

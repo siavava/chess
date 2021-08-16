@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.List;
 
 /* local dependencies */
+import ChessErrors.FailedInitException;
+import ChessErrors.InvalidCellException;
 import ChessLib.*;
 import Pieces.*;
 import Pieces.Piece.Suit;
@@ -24,12 +26,17 @@ public class ChessGame extends JFrame {
     /* Remember captured pieces */
     private Map<Suit, List<Piece>> capturedPieces;
 
-    public ChessGame()  {
+    public ChessGame() {
         // Initialize JFrame
         super("Chess Game");
 
         // Initialize Pieces and Board
-        initPieces();
+        try {
+            initPieces();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         this.chessboard = new ChessBoard();
 
 
@@ -47,7 +54,19 @@ public class ChessGame extends JFrame {
         pack();
         setVisible(true);
         // Initialize Pieces and Board
-        initPieces();
+        for (int trial = 0; trial <= 5; trial++) {
+            try {
+                initPieces();
+                break;
+            }
+            catch (InvalidCellException e) {
+                e.printStackTrace();
+                if (trial == 5) {
+                    System.exit(-1);
+                }
+            }
+        }
+
         this.chessboard = new ChessBoard();
 
     }
@@ -65,8 +84,8 @@ public class ChessGame extends JFrame {
 
         };
 
-        int width = ChessBoard.SIZE;
-        int height = ChessBoard.SIZE;
+        int width = ChessBoard.BOARD_SIZE;
+        int height = ChessBoard.BOARD_SIZE;
 
         board.setPreferredSize(new Dimension(width, height));
 
@@ -114,7 +133,7 @@ public class ChessGame extends JFrame {
      */
     private Point getCell(@NotNull Point point) {
         double x = point.getX(), y = point.getY();
-        double cellSize = (double) ChessBoard.SIZE / 8;
+        double cellSize = (double) ChessBoard.BOARD_SIZE / 8;
 
         int xCell = (int) (x / cellSize);
         int yCell = (int) (y / cellSize);
@@ -124,7 +143,7 @@ public class ChessGame extends JFrame {
     /**
      * Method to initialize pieces and positions during start of game.
      */
-    private void initPieces() {
+    private void initPieces() throws InvalidCellException {
 
         // initialize captured pieces
         this.capturedPieces = new HashMap<>();
@@ -177,16 +196,16 @@ public class ChessGame extends JFrame {
                     }
                 }
                 catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    e.printStackTrace();
                 }
             }
 
 
         }
         System.out.println("INITIALIZATION DONE!!");
-        for (String suit : this.pieces.keySet()) {
-            for (int square : this.pieces.get(suit).keySet()) {
-                Piece piece = this.pieces.get(suit).get(square);
+        for (Suit suit : pieces.keySet()) {
+            for (int square : pieces.get(suit).keySet()) {
+                Piece piece = pieces.get(suit).get(square);
                 System.out.println(suit + " at: " + square + ": " + piece);
                 System.out.println("Square: " + ChessLib.intToRef(square));
             }

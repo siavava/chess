@@ -1,10 +1,15 @@
 package ChessErrors;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 public enum ChessErrors implements Serializable {
     OCCUPIED_CELL(0, "The cell is occupied."),
-    ILLEGAL_MOVE(1, "The movement is invalid");
+    ILLEGAL_MOVE(1, "The movement is invalid"),
+    INVALID_CELL(2, "The cell reference is invalid."),
+    FAILED_INIT(3, "Initialization of pieces failed.");
 
     private transient final int errCode;
     private transient final String description;
@@ -22,8 +27,9 @@ public enum ChessErrors implements Serializable {
         return this.description;
     }
 
+    @Contract(pure = true)
     @Override
-    public String toString() {
-        return errCode + ": " + description;
+    public @NotNull String toString() {
+        return getErrorCode() + ": " + description;
     }
 }

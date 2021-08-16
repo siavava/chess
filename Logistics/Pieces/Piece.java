@@ -16,6 +16,10 @@ public interface Piece {
         BLACK
     }
 
+    abstract class Moves {
+
+    }
+
     /**
      * move a piece
      * @param newMove move to apply!
