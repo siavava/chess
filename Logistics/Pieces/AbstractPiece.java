@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class AbstractPiece implements Piece {
 
-    private final ID identity;
+    protected final ID identity;
 
     protected Suit suit;                // Suit
     protected BufferedImage image;      // Visual representation of ChessPieces.Piece

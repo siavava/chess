@@ -17,12 +17,11 @@ import Pieces.*;
 import Pieces.Piece.Suit;
 import ChessLib.ChessBoard.Cell;
 import Pieces.Piece.ID;
-import org.jetbrains.annotations.NotNull;
 
 public class ChessGame extends JFrame {
     private ChessBoard chessboard;                          // chess board
     public Suit TURN;                                    // Whose turn? Suit.WHITE or Suit.BLACK
-    private Map<Suit, Map<ID, Boolean>> enPassant;
+    private Map<Suit, Map<ID, Boolean>> castling;
 
     /* Remember captured pieces */
     private Map<Suit, List<Piece>> capturedPieces;
@@ -122,26 +121,33 @@ public class ChessGame extends JFrame {
         this.capturedPieces.get(capturedSuit).add(target);
     }
 
+    private void changeTurn() {
+        switch (this.TURN) {
+            case WHITE -> TURN = Suit.BLACK;
+            case BLACK -> TURN = Suit.WHITE;
+        }
+    }
+
     public void activateCastling(char status) {
-        if (this.enPassant == null) {
-            this.enPassant = new HashMap<>();
+        if (this.castling == null) {
+            this.castling = new HashMap<>();
         }
         switch (status) {
             case 'K' -> {
-                this.enPassant.getOrDefault(Suit.WHITE, new HashMap<>())
+                this.castling.getOrDefault(Suit.WHITE, new HashMap<>())
                         .put(ID.KING, true);
             }
             case 'Q' -> {
-                this.enPassant.getOrDefault(Suit.WHITE, new HashMap<>())
+                this.castling.getOrDefault(Suit.WHITE, new HashMap<>())
                         .put(ID.QUEEN, true);
             }
             case 'k' -> {
-                this.enPassant.getOrDefault(Suit.BLACK, new HashMap<>())
+                this.castling.getOrDefault(Suit.BLACK, new HashMap<>())
                         .put(ID.KING, true);
 
             }
             case 'q' -> {
-                this.enPassant.getOrDefault(Suit.BLACK, new HashMap<>())
+                this.castling.getOrDefault(Suit.BLACK, new HashMap<>())
                         .put(ID.QUEEN, true);
             }
         }
@@ -151,18 +157,16 @@ public class ChessGame extends JFrame {
         Point ref = ChessUtilities.realToRef(point);
         if (this.selected != null) {
             try {
-                System.out.println(this.selected);
-                System.out.println("source: " + ref);
-
-                chessboard.moveTo(ref, selected);
-                capture(selected);
-                this.selected = null;
-                repaint();
+                if (chessboard.moveTo(TURN, ref, selected)) {
+                    capture(selected);
+                    changeTurn();
+                    repaint();
+                }
             }
             catch (IllegalMoveException e) {
-                this.selected = null;
                 e.printStackTrace();
             }
+            selected = null;
         }
         else {
             Cell cell = chessboard.getCell(ref);
@@ -179,20 +183,6 @@ public class ChessGame extends JFrame {
 
     private void handleDrag(Point point) {
 
-    }
-
-    /**
-     * Given a Point in real coordinates, return the cell of the point
-     * @param point point to check
-     * @return Point representing x and y of cell (1 to 8)
-     */
-    private @NotNull Point getCell(@NotNull Point point) {
-        double x = point.getX(), y = point.getY();
-        double cellSize = (double) ChessBoard.BOARD_SIZE / 8;
-
-        int xCell = (int) (x / cellSize);
-        int yCell = (int) (y / cellSize);
-        return new Point(xCell, yCell);
     }
 
     public ChessBoard getChessBoard() {

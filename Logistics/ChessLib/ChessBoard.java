@@ -10,6 +10,7 @@ import java.util.Map;
 /* custom packages */
 import ChessErrors.*;
 import Pieces.*;
+import Pieces.Piece.Suit;
 import org.jetbrains.annotations.NotNull;
 
 public class ChessBoard {
@@ -119,16 +120,42 @@ public class ChessBoard {
         return 0 < p.getX() && p.getX() <= 8 && 0 < p.getY() && p.getY() <= 8;
     }
 
-    public void moveTo(Point dest, Piece piece) throws IllegalMoveException {
-        int steps = ChessUtilities.numSteps(piece.getPosition(), dest);
-        if (piece.getMoves().contains(steps)) {
-            move(piece, steps);
+    private void checkPawnCapture(Piece piece, List<Integer> moves) {
+        if (piece instanceof Pawn) {
+            Pawn pawn = (Pawn) piece;
+            pawn.checkCapture(this, moves);
+        }
+    }
+
+    public boolean moveTo(Suit TURN, Point dest, Piece piece) throws IllegalMoveException {
+        if (TURN == piece.getSuit()) {
+            int steps = ChessUtilities.numSteps(piece.getPosition(), dest);
+            List<Integer> moves = piece.getMoves();
+            checkPawnCapture(piece, moves);
+            if (!ChessUtilities.GLIDE_STATUS.get(piece.getID()) &&
+                    moves.contains(steps)) {
+                move(piece, steps);
+                return true;
+            }
+            else if (ChessUtilities.GLIDE_STATUS.get(piece.getID())) {
+                for (int dir : piece.getMoves()) {
+                    if (steps % dir == 0) {
+                        move(piece, steps);
+                        return true;
+                    }
+                }
+            }
+            else {
+                System.out.println("steps: " + steps);
+                IllegalMoveException e = new IllegalMoveException(new Throwable());
+                e.printStackTrace();
+            }
         }
         else {
-            System.out.println("steps: " + steps);
-            IllegalMoveException e = new IllegalMoveException(new Throwable());
+            Exception e = new InvalidTurnException(new Throwable());
             e.printStackTrace();
         }
+        return false;
     }
 
     public void move(Piece p, int steps) throws IllegalMoveException {
@@ -191,10 +218,13 @@ public class ChessBoard {
     private Cell getCell(Piece p) {
         return getCell(p.getX(), p.getY());
     }
+    public Cell getCell(int ref) {
+        return cells.getOrDefault(ref, null);
+    }
 
     private Cell getCell(double file, double rank) {
         int reference = ChessUtilities.refToNumber((int) file, (int) rank);
-        return cells.getOrDefault(reference, null);
+        return getCell(reference);
     }
 
     private void removePiece(Piece p) {
