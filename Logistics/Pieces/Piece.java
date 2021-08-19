@@ -36,7 +36,7 @@ public interface Piece {
      */
     ID getID();
 
-    String getSuit();
+    Suit getSuit();
 
     List<Integer> getPosMoves();
 

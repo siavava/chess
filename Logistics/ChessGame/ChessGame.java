@@ -116,6 +116,11 @@ public class ChessGame extends JFrame {
         return board;
     }
 
+    private void capture (Piece target) {
+        Suit capturedSuit = target.getSuit();
+        this.capturedPieces.get(capturedSuit).add(target);
+    }
+
     private void handlePress(Point point) {
         Point ref = ChessUtilities.realToRef(point);
         if (this.selected != null) {
@@ -124,6 +129,7 @@ public class ChessGame extends JFrame {
                 System.out.println("source: " + ref);
 
                 chessboard.moveTo(ref, selected);
+                capture(selected);
                 this.selected = null;
                 repaint();
             }

@@ -138,11 +138,8 @@ public abstract class AbstractPiece implements Piece {
         return (posMoves != null) ? posMoves : new LinkedList<>();
     }
 
-    public String getSuit() {
-        return switch (this.suit) {
-            case BLACK -> "black";
-            case WHITE -> "white";
-        };
+    public Suit getSuit() {
+        return this.suit;
     }
 
     public Point getPosition() {

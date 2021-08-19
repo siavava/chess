@@ -18,37 +18,62 @@ import java.util.List;
 public class ChessUtilities {
 
     /* Constants */
-    public static int KING_VALUE = Integer.MAX_VALUE;
-    public static int QUEEN_VALUE = 9;
-    public static int ROOK_VALUE = 5;
-    public static int BISHOP_VALUE = 3;
-    public static int KNIGHT_VALUE = 3;
-    public static int PAWN_VALUE = 1;
+    public static int KING_VALUE;
+    public static int QUEEN_VALUE;
+    public static int ROOK_VALUE;
+    public static int BISHOP_VALUE;
+    public static int KNIGHT_VALUE;
+    public static int PAWN_VALUE;
 
-    public static final int BOARD_SIZE = 800;
-    public static final int CELL_SIZE = BOARD_SIZE / 8;
-    public static final int DARK_COLOR = Color.GRAY.getRGB();
-    public static final int LIGHT_COLOR = Color.PINK.getRGB();
+    public static final int BOARD_SIZE;
+    public static final int CELL_SIZE;
+    public static final int DARK_COLOR;
+    public static final int LIGHT_COLOR;
 
-    public static final String startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    public static final String startingFEN;
 
-    public static Map<ID, List<Integer>> ALL_MOVES = Map.of (
-        ID.KING, Arrays.asList(-9, -8, -7, -1, 1, 7, 8, 9),
-        ID.QUEEN, Arrays.asList(-9, -8, -7, -1, 1, 7, 8, 9),
-        ID.ROOK, Arrays.asList(-8, -1, 1, 8),
-        ID.BISHOP, Arrays.asList(-9, -7, 7, 9),
-        ID.KNIGHT, Arrays.asList(-17, -15, -10, -6, 6, 10, 15, 17),
-        ID.PAWN, Collections.singletonList(8)
-    );
+    public static Map<ID, List<Integer>> ALL_MOVES;
 
-    public static Map<ID, Boolean> GLIDE_STATUS = Map.of (
-        ID.KING, false,
-        ID.QUEEN, true,
-        ID.ROOK, true,
-        ID.BISHOP, true,
-        ID.KNIGHT, false,
-        ID.PAWN, false
-    );
+    public static Map<ID, Boolean> GLIDE_STATUS;
+
+    /* static block to initialize all variables,
+     * so they are not recomputed every other time
+     * the value is accessed.
+     */
+    static {
+        /* Constants */
+        KING_VALUE = Integer.MAX_VALUE;
+        QUEEN_VALUE = 9;
+        ROOK_VALUE = 5;
+        BISHOP_VALUE = 3;
+        KNIGHT_VALUE = 3;
+        PAWN_VALUE = 1;
+
+        BOARD_SIZE = 800;
+        CELL_SIZE = BOARD_SIZE / 8;
+        DARK_COLOR = Color.GRAY.getRGB();
+        LIGHT_COLOR = Color.PINK.getRGB();
+
+        startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+        ALL_MOVES = Map.of (
+                ID.KING, Arrays.asList(-9, -8, -7, -1, 1, 7, 8, 9),
+                ID.QUEEN, Arrays.asList(-9, -8, -7, -1, 1, 7, 8, 9),
+                ID.ROOK, Arrays.asList(-8, -1, 1, 8),
+                ID.BISHOP, Arrays.asList(-9, -7, 7, 9),
+                ID.KNIGHT, Arrays.asList(-17, -15, -10, -6, 6, 10, 15, 17),
+                ID.PAWN, Collections.singletonList(8)
+        );
+
+        GLIDE_STATUS = Map.of (
+                ID.KING, false,
+                ID.QUEEN, true,
+                ID.ROOK, true,
+                ID.BISHOP, true,
+                ID.KNIGHT, false,
+                ID.PAWN, false
+        );
+    }
 
     public static void loadFEN(@NotNull ChessGame gameInstance, String fen) {
         ChessBoard board = gameInstance.getChessBoard();
