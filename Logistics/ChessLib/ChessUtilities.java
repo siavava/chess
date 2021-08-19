@@ -73,23 +73,28 @@ public class ChessUtilities {
     }
 
     public static void loadFEN(@NotNull ChessGame gameInstance, String fen) {
-        ChessBoard board = gameInstance.getChessBoard();
-        parseFenPieces(board, fen);
-        parseFenStatus(gameInstance, fen);
+
+        parseFenPieces(gameInstance, fen);
+        parsePlayerTurn(gameInstance, fen);
+        checkCastling(gameInstance, fen);
     }
 
     public static void loadStartingFEN(ChessGame gameInstance) {
         loadFEN(gameInstance, startingFEN);
     }
 
-    private static void parseFenStatus(ChessGame gameInstance, String fen) {
+    public static void parsePlayerTurn(ChessGame gameInstance, String fen) {
         boolean status = false;
         for (char c : fen.toCharArray()) {
-
             if (status) {
-                if (c == 'w') gameInstance.TURN = Suit.WHITE;
-                else if (c == 'b') gameInstance.TURN = Suit.BLACK;
-//                else if (c == 'K')
+                if (c == 'w') {
+                    gameInstance.TURN = Suit.WHITE;
+                    break;
+                }
+                else if (c == 'b') {
+                    gameInstance.TURN = Suit.BLACK;
+                    break;
+                }
             }
             else if (c == ' ') {
                 status = true;
@@ -97,7 +102,17 @@ public class ChessUtilities {
         }
     }
 
-    private static void parseFenPieces(@NotNull ChessBoard board, @NotNull String fen) {
+    public static void checkCastling(ChessGame gameInstance, String fen) {
+        int spaces = 0;
+        for (char c : fen.toCharArray()) {
+            if (c == ' ') spaces++;
+            else if (spaces == 2) gameInstance.activateCastling(c);
+            else if (spaces > 2) break;
+        }
+    }
+
+    private static void parseFenPieces(ChessGame gameInstance, @NotNull String fen) {
+        ChessBoard board = gameInstance.getChessBoard();
         int file = 1, rank = 8;
         boolean pieces = true;
         Suit suit;

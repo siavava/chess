@@ -120,22 +120,41 @@ public class ChessBoard {
     }
 
     public void moveTo(Point dest, Piece piece) throws IllegalMoveException {
-        int steps = ChessUtilities.numSteps(dest, piece.getPosition());
-        move(piece, steps);
+        int steps = ChessUtilities.numSteps(piece.getPosition(), dest);
+        if (piece.getMoves().contains(steps)) {
+            move(piece, steps);
+        }
+        else {
+            System.out.println("steps: " + steps);
+            IllegalMoveException e = new IllegalMoveException(new Throwable());
+            e.printStackTrace();
+        }
     }
 
     public void move(Piece p, int steps) throws IllegalMoveException {
-        int x = p.getX(), y = p.getY();
-        int dx = steps % 8;
-        int dy = steps / 8;
-        Point target = new Point(x + dx, y + dy);
-        System.out.println("target: " + target);
-        if (isInBoard(target)) {
-            removePiece(p);
-            p.moveTo(x + dx, y + dy);
-            addPiece(p);
+        int current = ChessUtilities.refToNumber(p.getX(), p.getY());
+        int target = current + steps;
+        Point targetPoint;
+        try {
+            targetPoint = ChessUtilities.numberToRef(target);
+
+            System.out.println("target: " + targetPoint);
+            if (isInBoard(targetPoint)) {
+                removePiece(p);
+                p.moveTo(targetPoint);
+                addPiece(p);
+            }
+            else {
+                System.out.println("steps : " + steps);
+                Exception e = new IllegalMoveException(new Throwable());
+                e.printStackTrace();
+            }
         }
-        else throw new IllegalMoveException(new Throwable());
+        catch (InvalidCellException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
     }
 
     public Iterable<Piece> iter() {

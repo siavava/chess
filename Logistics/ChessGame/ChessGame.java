@@ -16,12 +16,13 @@ import ChessLib.*;
 import Pieces.*;
 import Pieces.Piece.Suit;
 import ChessLib.ChessBoard.Cell;
+import Pieces.Piece.ID;
 import org.jetbrains.annotations.NotNull;
 
 public class ChessGame extends JFrame {
     private ChessBoard chessboard;                          // chess board
     public Suit TURN;                                    // Whose turn? Suit.WHITE or Suit.BLACK
-    private Map<String, Boolean> gameState;
+    private Map<Suit, Map<ID, Boolean>> enPassant;
 
     /* Remember captured pieces */
     private Map<Suit, List<Piece>> capturedPieces;
@@ -121,6 +122,31 @@ public class ChessGame extends JFrame {
         this.capturedPieces.get(capturedSuit).add(target);
     }
 
+    public void activateCastling(char status) {
+        if (this.enPassant == null) {
+            this.enPassant = new HashMap<>();
+        }
+        switch (status) {
+            case 'K' -> {
+                this.enPassant.getOrDefault(Suit.WHITE, new HashMap<>())
+                        .put(ID.KING, true);
+            }
+            case 'Q' -> {
+                this.enPassant.getOrDefault(Suit.WHITE, new HashMap<>())
+                        .put(ID.QUEEN, true);
+            }
+            case 'k' -> {
+                this.enPassant.getOrDefault(Suit.BLACK, new HashMap<>())
+                        .put(ID.KING, true);
+
+            }
+            case 'q' -> {
+                this.enPassant.getOrDefault(Suit.BLACK, new HashMap<>())
+                        .put(ID.QUEEN, true);
+            }
+        }
+    }
+
     private void handlePress(Point point) {
         Point ref = ChessUtilities.realToRef(point);
         if (this.selected != null) {
@@ -134,6 +160,7 @@ public class ChessGame extends JFrame {
                 repaint();
             }
             catch (IllegalMoveException e) {
+                this.selected = null;
                 e.printStackTrace();
             }
         }

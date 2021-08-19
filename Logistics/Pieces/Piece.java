@@ -14,6 +14,8 @@ public interface Piece {
 
     void moveTo(int row, int rank);
 
+    void moveTo(Point p);
+
     /** BLACK or WHITE */
     enum Suit {
         WHITE,

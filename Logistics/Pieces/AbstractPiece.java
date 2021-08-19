@@ -105,6 +105,10 @@ public abstract class AbstractPiece implements Piece {
         this.position = new Point(row, rank);
     }
 
+    public void moveTo (Point p) {
+        moveTo((int) p.getX(), (int) p.getY());
+    }
+
     @Override
     public void draw(@NotNull Graphics g) {
         Point currentPos = ChessUtilities.refToReal(position);
