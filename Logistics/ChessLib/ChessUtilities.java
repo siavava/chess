@@ -17,14 +17,6 @@ import java.util.List;
  */
 public class ChessUtilities {
 
-    /* Constants */
-    public static int KING_VALUE;
-    public static int QUEEN_VALUE;
-    public static int ROOK_VALUE;
-    public static int BISHOP_VALUE;
-    public static int KNIGHT_VALUE;
-    public static int PAWN_VALUE;
-
     public static final int BOARD_SIZE;
     public static final int CELL_SIZE;
     public static final int DARK_COLOR;
