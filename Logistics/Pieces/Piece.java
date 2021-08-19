@@ -1,7 +1,5 @@
 package Pieces;
 
-import ChessLib.Move;
-
 import java.awt.*;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public interface Piece {
 
     Suit getSuit();
 
-    List<Integer> getPosMoves();
+    List<Integer> getMoves();
 
     /**
      * Draw a ChessPieces.Piece

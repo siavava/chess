@@ -72,7 +72,7 @@ public class ChessBoard {
         }
 
         public List<Integer> nextMoves() {
-            return occupant != null ? occupant.getPosMoves() : null;
+            return occupant != null ? occupant.getMoves() : null;
         }
     }
 

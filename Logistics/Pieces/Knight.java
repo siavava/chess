@@ -1,22 +1,11 @@
 package Pieces;
 
-import ChessLib.Move;
-
 import java.awt.*;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class Knight extends AbstractPiece {
 
     public Knight(Suit suit, Point position) {
         super(ID.KNIGHT, suit, position);
-
-        // Initialize move behavior
-        posMoves = Arrays.asList(-17, -15, -10, -6, 6, 10, 15, 17);
-
-        // Initialize value of ChessPieces.Piece
-        this.value = 3;
     }
 
     public Knight (Suit suit, int file, int rank) {
@@ -30,11 +19,5 @@ public class Knight extends AbstractPiece {
         else {
             return "./img/N-black.png";
         }
-    }
-
-    public List<Move> getMoves() {
-        List<Move> possibleMoves;
-
-        return null;
     }
 }

@@ -34,6 +34,8 @@ public class ChessUtilities {
 
     public static Map<ID, List<Integer>> ALL_MOVES;
 
+    public static Map<ID, Integer> ALL_VALUES;
+
     public static Map<ID, Boolean> GLIDE_STATUS;
 
     /* static block to initialize all variables,
@@ -41,14 +43,8 @@ public class ChessUtilities {
      * the value is accessed.
      */
     static {
-        /* Constants */
-        KING_VALUE = Integer.MAX_VALUE;
-        QUEEN_VALUE = 9;
-        ROOK_VALUE = 5;
-        BISHOP_VALUE = 3;
-        KNIGHT_VALUE = 3;
-        PAWN_VALUE = 1;
 
+        /* constant values */
         BOARD_SIZE = 800;
         CELL_SIZE = BOARD_SIZE / 8;
         DARK_COLOR = Color.GRAY.getRGB();
@@ -63,6 +59,15 @@ public class ChessUtilities {
                 ID.BISHOP, Arrays.asList(-9, -7, 7, 9),
                 ID.KNIGHT, Arrays.asList(-17, -15, -10, -6, 6, 10, 15, 17),
                 ID.PAWN, Collections.singletonList(8)
+        );
+
+        ALL_VALUES = Map.of (
+                ID.KING, Integer.MAX_VALUE,
+                ID.QUEEN, 9,
+                ID.ROOK, 5,
+                ID.BISHOP, 3,
+                ID.KNIGHT, 3,
+                ID.PAWN, 1
         );
 
         GLIDE_STATUS = Map.of (
