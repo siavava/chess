@@ -10,27 +10,31 @@ import java.util.List;
  */
 public interface Piece {
 
+    int getX();
+
+    int getY();
+
+    void moveTo(int row, int rank);
+
     /** BLACK or WHITE */
     enum Suit {
         WHITE,
         BLACK
     }
 
-    abstract class Moves {
-
+    enum ID {
+        KING, QUEEN, ROOK,
+        BISHOP, KNIGHT, PAWN
     }
 
-    /**
-     * move a piece
-     * @param newMove move to apply!
-     */
-    void move(Move newMove);
+    Point getPosition();
+
 
     /**
      * Get ID of ChessPieces.Piece
      * @return String ID
      */
-    String getID();
+    ID getID();
 
     String getSuit();
 

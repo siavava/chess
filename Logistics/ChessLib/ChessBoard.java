@@ -2,6 +2,7 @@ package ChessLib;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 /* custom packages */
 import ChessErrors.*;
 import Pieces.*;
+import org.jetbrains.annotations.NotNull;
 
 public class ChessBoard {
     public static final int BOARD_SIZE = 800;
@@ -20,17 +22,21 @@ public class ChessBoard {
     private final Map<Integer, Cell> cells;
 
     public static class Cell {
-        private final Color color;
-        private final ChessBoard parentBoard;
         private final Point position;
         private Piece occupant = null;
 
-        public Cell(ChessBoard parentBoard, int file, int rank) {
-            this.parentBoard = parentBoard;
+        public Cell(int file, int rank) {
             this.position = new Point(file, rank);
+        }
 
-            boolean isLightSquare = (file + rank) % 2 != 0;
-            this.color = isLightSquare? new Color(LIGHT_COLOR) : new Color(DARK_COLOR);
+        public Cell (int file, int rank, Piece piece) {
+            this (file, rank);
+            try {
+                addOccupant(piece);
+            }
+            catch (OccupiedCellException e) {
+                e.printStackTrace();
+            }
         }
 
         public boolean hasOccupant() {
@@ -41,14 +47,15 @@ public class ChessBoard {
             return this.occupant;
         }
 
-        public void addOccupant(Piece occupant) throws CellOccupiedException {
+        public void addOccupant(Piece occupant) throws OccupiedCellException {
 
             try {
-                assert this.occupant == null;
                 this.occupant = occupant;
+                assert this.occupant == null;
+
             }
             catch (AssertionError e) {
-                throw new CellOccupiedException(e);
+                throw new OccupiedCellException(e);
             }
         }
 
@@ -56,10 +63,12 @@ public class ChessBoard {
             this.occupant = null;
         }
 
-        public boolean isPoint(int file, int rank) {
-            assert(file > 0 && file < 9);
-            assert(rank > 0 && rank < 9);
-            return this.position.equals(new Point(file, rank));
+        public boolean isPoint(int rank, int file) {
+            return isPoint(new Point(rank, file));
+        }
+
+        public boolean isPoint(Point pos) {
+            return this.position.equals(pos);
         }
 
         public List<Integer> nextMoves() {
@@ -73,8 +82,6 @@ public class ChessBoard {
         board = new BufferedImage(BOARD_SIZE, BOARD_SIZE, BufferedImage.TYPE_INT_ARGB);
         this.cells = new HashMap<>();
 
-        // Track x coordinate
-
         // Loop over columns in board
         for (int file=1; file<=8; file++) {
 
@@ -84,10 +91,10 @@ public class ChessBoard {
                 boolean isLightSquare = (file + rank) % 2 != 0;
                 int color = isLightSquare? LIGHT_COLOR : DARK_COLOR;
 
-                cells.put(ChessLib.refToInt(file, rank), new Cell(this, file, rank));
+                cells.put(ChessUtilities.refToNumber(file, rank), new Cell(file, rank));
 
 
-                Point currentDims = ChessLib.refToReal(new Point(file, rank));
+                Point currentDims = ChessUtilities.refToReal(new Point(file, rank));
                 int x = (int) currentDims.getX();
                 int y = (int) currentDims.getY();
 
@@ -108,15 +115,83 @@ public class ChessBoard {
         }
     }
 
-    public boolean isInBoard(Point p) {
-        return 0<=p.getX() && p.getX()< BOARD_SIZE && 0 <= p.getY() && p.getY() < BOARD_SIZE;
+    public boolean isInBoard(@NotNull Point p) {
+        return 0 < p.getX() && p.getX() <= 8 && 0 < p.getY() && p.getY() <= 8;
+    }
+
+    public void moveTo(Point dest, Piece piece) throws IllegalMoveException {
+        int steps = ChessUtilities.numSteps(dest, piece.getPosition());
+        move(piece, steps);
+    }
+
+    public void move(Piece p, int steps) throws IllegalMoveException {
+        int x = p.getX(), y = p.getY();
+        int dx = steps % 8;
+        int dy = steps / 8;
+        Point target = new Point(x + dx, y + dy);
+        System.out.println("target: " + target);
+        if (isInBoard(target)) {
+            removePiece(p);
+            p.moveTo(x + dx, y + dy);
+            addPiece(p);
+        }
+        else throw new IllegalMoveException(new Throwable());
+    }
+
+    public Iterable<Piece> iter() {
+        List<Piece> all = new ArrayList<>();
+        for (Cell cell : this.cells.values()) {
+            if (cell.hasOccupant()) {
+                all.add(cell.getOccupant());
+            }
+        }
+        return all;
+    }
+
+    public void addPiece(@NotNull Piece piece) {
+        double file = piece.getPosition().getX();
+        double rank = piece.getPosition().getY();
+
+        Cell targetCell;
+        if ( (targetCell = this.getCell(file, rank)) == null) {
+            return;
+        }
+
+        try {
+            targetCell.addOccupant(piece);
+        }
+        catch (OccupiedCellException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Cell getCell(Point p) {
+        return getCell(p.getX(), p.getY());
+    }
+
+    private Cell getCell(Piece p) {
+        return getCell(p.getX(), p.getY());
+    }
+
+    private Cell getCell(double file, double rank) {
+        int reference = ChessUtilities.refToNumber((int) file, (int) rank);
+        return cells.getOrDefault(reference, null);
+    }
+
+    private void removePiece(Piece p) {
+        Cell c = getCell(p);
+        c.occupant = null;
     }
 
     /**
      * Method to draw board.
      * @param g Graphics window
      */
-    public void draw(Graphics g) {
+    public void draw(@NotNull Graphics g) {
         g.drawImage(board, 0, 0, null);
+
+        for (Piece piece : iter()) {
+            piece.draw(g);
+        }
     }
 }

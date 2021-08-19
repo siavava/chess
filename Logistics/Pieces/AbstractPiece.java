@@ -1,8 +1,7 @@
 package Pieces;
 
-import ChessErrors.UnknownPieceException;
 import ChessLib.ChessBoard;
-import ChessLib.ChessLib;
+import ChessLib.ChessUtilities;
 import ChessLib.Move;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public abstract class AbstractPiece implements Piece {
 
     private boolean isActive = false;   // track if piece is active on board
-    private final String id;            // Identifier
+    private final ID identity;
 
     protected Suit suit;                // Suit
     protected BufferedImage image;      // Visual representation of ChessPieces.Piece
@@ -27,17 +26,17 @@ public abstract class AbstractPiece implements Piece {
     public Point position;              // piece position on board
     public List<Integer> posMoves;      // List of possible moves
 
-    public Moves legalMoves;
+    public Move legalMoves;
 
 
     /**
      * Constructor with name, suit, position
-     * @param type K, Q, R, B, N, P
+     * @param identity K, Q, R, B, N, P
      * @param suit white or black
      * @param position current position square
      * @throws IOException Error loading piece image
      */
-    public AbstractPiece(char type, Suit suit, Point position) throws IOException {
+    public AbstractPiece(ID identity, Suit suit, Point position) {
 
         // Set Suit
         this.suit = suit;
@@ -45,19 +44,17 @@ public abstract class AbstractPiece implements Piece {
         // Set Point (row and rank)
         this.position = position;
 
+        // Set ID
+        this.identity = identity;
+
+        // Set image
         try {
-            this.legalMoves = new Moves(this);
+            this.setImage();
         }
-        catch (UnknownPieceException e) {
+        catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
-
-        // Set ID
-        id = type +" @ " + this.position.getX() + " , " + this.position.getY();
-
-        // Set image
-        this.setImage();
     }
 
     /**
@@ -65,16 +62,27 @@ public abstract class AbstractPiece implements Piece {
      * @return String ID
      */
     @Override
-    public String getID() {
-        return this.id;
+    public ID getID() {
+        return this.identity;
     }
 
-    /**
-     * Method to move piece
-     */
-    @Override
-    public void move(Move newMove) {
+    public int getX() {
+        return position.x;
+    }
 
+    public int getY() {
+        return position.y;
+    }
+
+    public int getValue() {
+        return switch(identity) {
+            case KING -> ChessUtilities.KING_VALUE;
+            case QUEEN -> ChessUtilities.QUEEN_VALUE;
+            case ROOK -> ChessUtilities.ROOK_VALUE;
+            case BISHOP -> ChessUtilities.BISHOP_VALUE;
+            case KNIGHT -> ChessUtilities.KNIGHT_VALUE;
+            case PAWN -> ChessUtilities.PAWN_VALUE;
+        };
     }
 
     public void setImage() throws IOException {
@@ -85,8 +93,8 @@ public abstract class AbstractPiece implements Piece {
         catch(IOException e) {
             System.err.println(e.getMessage());
             System.err.println(filename + " could not be read, or an Error occurred.");
-//            e.printStackTrace();
-            throw new IOException(e);
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -98,7 +106,7 @@ public abstract class AbstractPiece implements Piece {
 
     @Override
     public String toString() {
-        return id;
+        return this.getSuit() + " : " + this.getID();
     }
 
     /**
@@ -113,9 +121,13 @@ public abstract class AbstractPiece implements Piece {
      */
     public abstract List<Move> getMoves();
 
+    public void moveTo(int row, int rank) {
+        this.position = new Point(row, rank);
+    }
+
     @Override
     public void draw(@NotNull Graphics g) {
-        Point currentPos = ChessLib.refToReal(position);
+        Point currentPos = ChessUtilities.refToReal(position);
         int px = (int) currentPos.getX() + ChessBoard.CELL_SIZE /5;
         int py = (int) currentPos.getY() + ChessBoard.CELL_SIZE /5;
         g.drawImage(this.image, px, py, null, null);
@@ -133,76 +145,7 @@ public abstract class AbstractPiece implements Piece {
         };
     }
 
-    public class Moves {
-        protected int steps;
-        protected int target;
-        protected double reward;
-        private final char type;
-        protected boolean valid = true;
-
-        public Moves (@NotNull Piece currentPiece) throws UnknownPieceException {
-            if (currentPiece instanceof Pawn) {
-                this.type = 'P';
-            }
-            else if (currentPiece instanceof King) {
-                this.type = 'K';
-            }
-            else if (currentPiece instanceof Queen) {
-                this.type = 'Q';
-            }
-            else if (currentPiece instanceof Rook) {
-                this.type = 'R';
-            }
-            else if (currentPiece instanceof Bishop) {
-                this.type = 'B';
-            }
-            else if (currentPiece instanceof Knight) {
-                this.type = 'N';
-            }
-            else {
-                throw new UnknownPieceException(new Throwable());
-            }
-        }
-
-        public void update(int x, int y) {
-
-
-        }
-
-
-        public int getMove() {
-            return this.target;
-        }
-
-        public double getReward() {
-            return reward;
-        }
-
-        private boolean checkMove() {
-            if (currentPiece instanceof Knight) {
-                if (target>0 && target<65 && target%8 != (target-steps) % 8) {
-                    this.valid = true;
-                }
-            }
-            else {
-                int currentDirection = 0;
-                for (int direction : currentPiece.getPosMoves()) {
-                    if (steps / target > 0 && steps % target == 0) {
-                        currentDirection = direction;
-                        break;
-                    }
-                }
-                assert currentDirection != 0;
-                String suit = currentPiece.getSuit();
-                for (int i = 0; i <= currentDirection * (steps/currentDirection); i++) {
-//                if (chessgame.get)
-                }
-
-            }
-
-
-
-            return false;
-        }
+    public Point getPosition() {
+        return this.position;
     }
 }

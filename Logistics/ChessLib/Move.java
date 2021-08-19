@@ -1,21 +1,72 @@
 package ChessLib;
 
 /* local dependencies */
+import ChessErrors.UnknownPieceException;
+import ChessGame.ChessGame;
 import Pieces.*;
+import ChessLib.ChessBoard.Cell;
+
+import java.util.List;
 
 /**
  * Handler for chess moves
  */
 public class Move {
-    protected int steps;
+    private int steps, dx, dy;
     protected int target;
     protected double reward;
-    private final Piece currentPiece;
+    private final char type;
     protected boolean valid = true;
+    ChessGame parent;
+    Cell destination;
 
-    public Move(Piece currentPiece, int currentPosition, int steps) {
-        target = currentPosition + steps;
-        this.currentPiece = currentPiece;
+    public Move (ChessGame parent, Piece currentPiece) throws UnknownPieceException {
+        if (currentPiece instanceof Pawn) {
+            this.type = 'P';
+        }
+        else if (currentPiece instanceof King) {
+            this.type = 'K';
+        }
+        else if (currentPiece instanceof Queen) {
+            this.type = 'Q';
+        }
+        else if (currentPiece instanceof Rook) {
+            this.type = 'R';
+        }
+        else if (currentPiece instanceof Bishop) {
+            this.type = 'B';
+        }
+        else if (currentPiece instanceof Knight) {
+            this.type = 'N';
+        }
+        else {
+            throw new UnknownPieceException(new Throwable());
+        }
+    }
+
+    public Move(ChessGame parent, Piece currentPiece, int steps) throws UnknownPieceException {
+        this(parent, currentPiece);
+        dy = steps % 8;      // rank
+        dx = steps / 8;      // row
+
+        int oldX = currentPiece.getX();
+        int oldY = currentPiece.getY();
+
+
+        currentPiece.moveTo(oldX + dx, oldY + dy);
+    }
+
+
+    public void check(int x, int y) {
+        List<Integer> posMoves = ChessUtilities.ALL_MOVES.get(this.type);
+        boolean glide_status = ChessUtilities.GLIDE_STATUS.get(this.type);
+
+        if (glide_status) {
+
+        }
+
+
+
     }
 
 
@@ -28,29 +79,6 @@ public class Move {
     }
 
     private boolean checkMove() {
-        if (currentPiece instanceof Knight) {
-            if (target>0 && target<65 && target%8 != (target-steps) % 8) {
-                this.valid = true;
-            }
-        }
-        else {
-            int currentDirection = 0;
-            for (int direction : currentPiece.getPosMoves()) {
-                if (steps / target > 0 && steps % target == 0) {
-                    currentDirection = direction;
-                    break;
-                }
-            }
-            assert currentDirection != 0;
-            String suit = currentPiece.getSuit();
-            for (int i = 0; i <= currentDirection * (steps/currentDirection); i++) {
-//                if (chessgame.get)
-            }
-
-        }
-
-
-
         return false;
     }
 }

@@ -8,14 +8,18 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Bishop extends AbstractPiece {
-    public Bishop(Suit suit, Point position) throws IOException {
-        super('B', suit, position);
+    public Bishop(Suit suit, Point position) {
+        super(ID.BISHOP, suit, position);
 
         // Initialize move behavior
         this.posMoves = Arrays.asList(-9, -7, 7, 9);
 
         // Set value of piece
         this.value = 3.11;
+    }
+
+    public Bishop (Suit suit, int file, int rank) {
+        this(suit, new Point(file, rank));
     }
 
     public String getImageFile() {

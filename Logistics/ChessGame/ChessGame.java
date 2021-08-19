@@ -1,4 +1,4 @@
-
+package ChessGame;
 /* language dependencies */
 import javax.swing.*;
 import java.awt.*;
@@ -10,36 +10,38 @@ import java.util.Map;
 import java.util.List;
 
 /* local dependencies */
-import ChessErrors.FailedInitException;
+import ChessErrors.IllegalMoveException;
 import ChessErrors.InvalidCellException;
 import ChessLib.*;
 import Pieces.*;
 import Pieces.Piece.Suit;
+import ChessLib.ChessBoard.Cell;
 import org.jetbrains.annotations.NotNull;
 
 public class ChessGame extends JFrame {
-//    private JComponent board;                             // Chess board
     private ChessBoard chessboard;                          // chess board
-    private Map<Suit, Map<Integer, Piece>> pieces;        // Map of suit -> position -> piece
-    private final boolean toMove = true;                    // Whose turn? true = white, false = black
+    public Suit TURN;                                    // Whose turn? Suit.WHITE or Suit.BLACK
+    private Map<String, Boolean> gameState;
 
     /* Remember captured pieces */
     private Map<Suit, List<Piece>> capturedPieces;
+    private Piece selected = null;
 
     public ChessGame() {
         // Initialize JFrame
         super("Chess Game");
 
-        // Initialize Pieces and Board
-        try {
-            initPieces();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.chessboard = new ChessBoard();
+        setUpCanvas();
 
+        setupChessBoard();
+    }
 
+    public ChessGame(String state) {
+        this();
+        ChessUtilities.loadFEN(this, state);
+    }
+
+    private void setUpCanvas() {
         // Helper to create Board JComponent
         JComponent board = setupBoard();
 
@@ -53,7 +55,12 @@ public class ChessGame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
+    }
+
+    private void setupChessBoard() {
         // Initialize Pieces and Board
+        this.chessboard = new ChessBoard();
+        this.TURN = Suit.WHITE;
         for (int trial = 0; trial <= 5; trial++) {
             try {
                 initPieces();
@@ -66,9 +73,6 @@ public class ChessGame extends JFrame {
                 }
             }
         }
-
-        this.chessboard = new ChessBoard();
-
     }
 
     /**
@@ -81,7 +85,6 @@ public class ChessGame extends JFrame {
                 super.paintComponent(g);
                 draw(g);
             }
-
         };
 
         int width = ChessBoard.BOARD_SIZE;
@@ -114,7 +117,26 @@ public class ChessGame extends JFrame {
     }
 
     private void handlePress(Point point) {
-        Point cell = getCell(point);
+        Point ref = ChessUtilities.realToRef(point);
+        if (this.selected != null) {
+            try {
+                System.out.println(this.selected);
+                System.out.println("source: " + ref);
+
+                chessboard.moveTo(ref, selected);
+                this.selected = null;
+                repaint();
+            }
+            catch (IllegalMoveException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            Cell cell = chessboard.getCell(ref);
+            if (cell.hasOccupant()) {
+                this.selected = cell.getOccupant();
+            }
+        }
 
     }
 
@@ -131,13 +153,21 @@ public class ChessGame extends JFrame {
      * @param point point to check
      * @return Point representing x and y of cell (1 to 8)
      */
-    private Point getCell(@NotNull Point point) {
+    private @NotNull Point getCell(@NotNull Point point) {
         double x = point.getX(), y = point.getY();
         double cellSize = (double) ChessBoard.BOARD_SIZE / 8;
 
         int xCell = (int) (x / cellSize);
         int yCell = (int) (y / cellSize);
         return new Point(xCell, yCell);
+    }
+
+    public ChessBoard getChessBoard() {
+        return this.chessboard;
+    }
+
+    public Iterable<Piece> getPieces() {
+        return this.chessboard.iter();
     }
 
     /**
@@ -150,65 +180,12 @@ public class ChessGame extends JFrame {
         capturedPieces.put(Suit.WHITE, new ArrayList<>());
         capturedPieces.put(Suit.BLACK, new ArrayList<>());
 
-        // Initialize vars
-        this.pieces = new HashMap<>();
-        Map<Integer, Piece> white = new HashMap<>();
-        Map<Integer, Piece> black = new HashMap<>();
-        pieces.put(Suit.WHITE, white);
-        pieces.put(Suit.BLACK, black);
-
         // Initialize pieces
-        for (int rank=1; rank<=8; rank++) {
-            Map<Integer, Piece> currentPieces = null;
-            Suit suit;
-            if (rank == 1 || rank == 2 || rank == 7 || rank == 8) {
-                if (rank <= 2) {
-                    suit = Suit.WHITE;
-                    currentPieces = white;
-                }
-                else {
-                    suit = Suit.BLACK;
-                    currentPieces = black;
-                }
-                try {
-                    for (int row=1; row<=8; row++) {
-                        int coordinate = ChessLib.refToInt(row, rank);
-                        if (rank == 2 || rank == 7) {
-                            currentPieces.put(coordinate, new Pawn(suit, new Point(row, rank)));
-                        }
-                        else {
-                            if (row == 1 || row == 8) {
-                                currentPieces.put(coordinate, new Rook(suit, new Point(row, rank)));
-                            }
-                            if (row == 2 || row == 7) {
-                                currentPieces.put(coordinate, new Knight(suit, new Point(row, rank)));
-                            }
-                            if (row == 3 || row == 6) {
-                                currentPieces.put(coordinate, new Bishop(suit, new Point(row, rank)));
-                            }
-                            if (row == 4) {
-                                currentPieces.put(coordinate, new Queen(suit, new Point(row, rank)));
-                            }
-                            if (row == 5) {
-                                currentPieces.put(coordinate, new King(suit, new Point(row, rank)));
-                            }
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        ChessUtilities.loadStartingFEN(this);
 
-
-        }
         System.out.println("INITIALIZATION DONE!!");
-        for (Suit suit : pieces.keySet()) {
-            for (int square : pieces.get(suit).keySet()) {
-                Piece piece = pieces.get(suit).get(square);
-                System.out.println(suit + " at: " + square + ": " + piece);
-                System.out.println("Square: " + ChessLib.intToRef(square));
-            }
+        for (Piece piece : this.getPieces()) {
+            System.out.println(piece);
         }
     }
 
@@ -218,12 +195,6 @@ public class ChessGame extends JFrame {
         chessboard.draw(g);
 
         // Get each piece and draw it.
-        for (Map<Integer, Piece> suit : pieces.values()) {
-            for (Piece piece : suit.values()) {
-                System.out.println(piece);
-                piece.draw(g);
-            }
-        }
     }
 
 
