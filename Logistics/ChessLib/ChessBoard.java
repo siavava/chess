@@ -14,13 +14,14 @@ import Pieces.Piece.Suit;
 import org.jetbrains.annotations.NotNull;
 
 public class ChessBoard {
-    public static final int BOARD_SIZE = 800;
-    public static final int CELL_SIZE = BOARD_SIZE / 8;
-    public static final int DARK_COLOR = Color.GRAY.getRGB();
-    public static final int LIGHT_COLOR = Color.PINK.getRGB();
+    public static final int BOARD_SIZE = ChessUtilities.BOARD_SIZE;
+    public static final int CELL_SIZE = ChessUtilities.CELL_SIZE;
+    public static final int DARK_COLOR = ChessUtilities.DARK_COLOR;
+    public static final int LIGHT_COLOR = ChessUtilities.LIGHT_COLOR;
 
     private final BufferedImage board;
     private final Map<Integer, Cell> cells;
+    private Map<Integer, Piece> indexOfPieces;
 
     public static class Cell {
         private final Point position;
@@ -50,14 +51,17 @@ public class ChessBoard {
 
         public void addOccupant(Piece occupant) throws OccupiedCellException {
 
-            try {
-                this.occupant = occupant;
-                assert this.occupant == null;
+            if (this.occupant != null) {
+                throw new OccupiedCellException(new Throwable());
+            }
+            this.occupant = occupant;
+        }
 
+        public void forceAddOccupant(Piece occupant) {
+            if (this.occupant != null) {
+                removeOccupant();
             }
-            catch (AssertionError e) {
-                throw new OccupiedCellException(e);
-            }
+            this.occupant = occupant;
         }
 
         public void removeOccupant() {
@@ -88,10 +92,12 @@ public class ChessBoard {
 
             // Loop over rows in board
             for (int rank=1; rank<=8; rank++) {
+
                 // Determine whether to color Black or white
                 boolean isLightSquare = (file + rank) % 2 != 0;
                 int color = isLightSquare? LIGHT_COLOR : DARK_COLOR;
 
+                // index the cell
                 cells.put(ChessUtilities.refToNumber(file, rank), new Cell(file, rank));
 
 
@@ -127,26 +133,61 @@ public class ChessBoard {
         }
     }
 
-    public boolean moveTo(Suit TURN, Point dest, Piece piece) throws IllegalMoveException {
+    private void indexPieces() {
+
+        // initialize index if needed
+        if (indexOfPieces == null) indexOfPieces = new HashMap<>();
+
+        // loop over cells in chessboard
+        for (int index : cells.keySet()) {
+
+            // index piece positions
+            if (cells.get(index).hasOccupant()) {
+                indexOfPieces.put(index, cells.get(index).getOccupant());
+            }
+        }
+    }
+
+    private void updateIndex(int oldPos, int newPos) {
+        if (indexOfPieces == null) {
+            indexPieces();
+        }
+        else {
+            Piece piece = indexOfPieces.remove(oldPos);
+            indexOfPieces.put(newPos, piece);
+        }
+    }
+
+    public boolean moveTo(Suit TURN, Point dest, @NotNull Piece piece) throws IllegalMoveException {
+
+        // check that it's player's turn to move
         if (TURN == piece.getSuit()) {
+
+            // calculate steps
             int steps = ChessUtilities.numSteps(piece.getPosition(), dest);
+
+            // get moves associated with piece
             List<Integer> moves = piece.getMoves();
             checkPawnCapture(piece, moves);
             if (!ChessUtilities.GLIDE_STATUS.get(piece.getID()) &&
                     moves.contains(steps)) {
+
+                // if attempted movement is valid, make move
                 move(piece, steps);
                 return true;
             }
             else if (ChessUtilities.GLIDE_STATUS.get(piece.getID())) {
                 for (int dir : piece.getMoves()) {
                     if (steps % dir == 0) {
+
+                        // if attempted move is valid, make move
                         move(piece, steps);
                         return true;
                     }
                 }
             }
             else {
-                System.out.println("steps: " + steps);
+                System.out.println("steps: " + steps + "was found to be invalid.");
                 IllegalMoveException e = new IllegalMoveException(new Throwable());
                 e.printStackTrace();
             }
@@ -154,6 +195,7 @@ public class ChessBoard {
         else {
             Exception e = new InvalidTurnException(new Throwable());
             e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         return false;
     }
@@ -170,21 +212,29 @@ public class ChessBoard {
                 removePiece(p);
                 p.moveTo(targetPoint);
                 addPiece(p);
+                updateIndex(current, target);
             }
             else {
                 System.out.println("steps : " + steps);
                 Exception e = new IllegalMoveException(new Throwable());
                 e.printStackTrace();
             }
+
         }
         catch (InvalidCellException e) {
             e.printStackTrace();
-            System.exit(1);
+            throw new IllegalMoveException(e);
         }
 
     }
 
     public Iterable<Piece> iter() {
+        if (indexOfPieces == null) {
+            indexPieces();
+        }
+        return indexOfPieces.values();
+
+        /*
         List<Piece> all = new ArrayList<>();
         for (Cell cell : this.cells.values()) {
             if (cell.hasOccupant()) {
@@ -192,6 +242,7 @@ public class ChessBoard {
             }
         }
         return all;
+         */
     }
 
     public void addPiece(@NotNull Piece piece) {

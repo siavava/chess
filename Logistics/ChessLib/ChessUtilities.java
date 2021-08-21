@@ -6,6 +6,7 @@ import Pieces.King;
 import Pieces.Piece.ID;
 import Pieces.*;
 import Pieces.Piece.Suit;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * A `static` Library of utility functions for the Chess project.
+ * A `static` Library of utility functions and shared data for the Chess project.
  */
 public class ChessUtilities {
 
@@ -24,11 +25,11 @@ public class ChessUtilities {
 
     public static final String startingFEN;
 
-    public static Map<ID, List<Integer>> ALL_MOVES;
+    public static final Map<ID, List<Integer>> ALL_MOVES;
 
-    public static Map<ID, Integer> ALL_VALUES;
+    public static final Map<ID, Integer> ALL_VALUES;
 
-    public static Map<ID, Boolean> GLIDE_STATUS;
+    public static final Map<ID, Boolean> GLIDE_STATUS;
 
     /* static block to initialize all variables,
      * so they are not recomputed every other time
@@ -83,7 +84,7 @@ public class ChessUtilities {
         loadFEN(gameInstance, startingFEN);
     }
 
-    public static void parsePlayerTurn(ChessGame gameInstance, String fen) {
+    private static void parsePlayerTurn(ChessGame gameInstance, @NotNull String fen) {
         boolean status = false;
         for (char c : fen.toCharArray()) {
             if (status) {
@@ -102,7 +103,7 @@ public class ChessUtilities {
         }
     }
 
-    public static void checkCastling(ChessGame gameInstance, String fen) {
+    private static void checkCastling(ChessGame gameInstance, @NotNull String fen) {
         int spaces = 0;
         for (char c : fen.toCharArray()) {
             if (c == ' ') spaces++;
@@ -111,7 +112,7 @@ public class ChessUtilities {
         }
     }
 
-    private static void parseFenPieces(ChessGame gameInstance, @NotNull String fen) {
+    private static void parseFenPieces(@NotNull ChessGame gameInstance, @NotNull String fen) {
         ChessBoard board = gameInstance.getChessBoard();
         int file = 1, rank = 8;
         boolean pieces = true;
@@ -131,7 +132,6 @@ public class ChessUtilities {
                     } else {
                         suit = Suit.BLACK;
                     }
-
 
                     /* Add the piece to the board */
                     switch (Character.toLowerCase(c)) {
@@ -158,7 +158,8 @@ public class ChessUtilities {
      * @param pos position int
      * @return position Point carrying  and y coordinates
      */
-    public static Point numberToRef(int pos) throws InvalidCellException {
+    @Contract("_ -> new")
+    public static @NotNull Point numberToRef(int pos) throws InvalidCellException {
         try {
             assert 0 < pos && pos <= 64;
             int row = pos % 8;
@@ -181,7 +182,7 @@ public class ChessUtilities {
         return (8 * (rank-1) + file);
     }
 
-    public static Point realToRef(@NotNull Point p) {
+    public static @NotNull Point realToRef(@NotNull Point p) {
 
         // Get point coordinates (row and rank)
         double px = p.getX(), py = p.getY();
@@ -200,7 +201,7 @@ public class ChessUtilities {
         return new Point(x, y);
     }
 
-    public static Point refToReal(@NotNull Point cell) {
+    public static @NotNull Point refToReal(@NotNull Point cell) {
         double row = cell.getX(), rank = cell.getY();
 
         // return Point at top-left corner of cell
@@ -224,5 +225,3 @@ public class ChessUtilities {
         return 8 * dy + dx;
     }
 }
-
-

@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pawn extends AbstractPiece {
+public final class Pawn extends AbstractPiece {
     private boolean enPassant = false;
     private boolean starting = true;
 

@@ -157,16 +157,23 @@ public class ChessGame extends JFrame {
         Point ref = ChessUtilities.realToRef(point);
         if (this.selected != null) {
             try {
-                if (chessboard.moveTo(TURN, ref, selected)) {
+                if ( (getChessBoard().getCell(ref).getOccupant() != null) &&
+                     (selected.getSuit() == getChessBoard().getCell(ref)
+                                .getOccupant().getSuit())  ) {
+                    selected = getChessBoard().getCell(ref).getOccupant();
+
+                }
+                else if (chessboard.moveTo(TURN, ref, selected)) {
                     capture(selected);
                     changeTurn();
                     repaint();
+                    selected = null;
                 }
             }
             catch (IllegalMoveException e) {
                 e.printStackTrace();
+                selected = null;
             }
-            selected = null;
         }
         else {
             Cell cell = chessboard.getCell(ref);

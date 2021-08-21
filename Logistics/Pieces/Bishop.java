@@ -2,7 +2,7 @@ package Pieces;
 
 import java.awt.*;
 
-public class Bishop extends AbstractPiece {
+public final class Bishop extends AbstractPiece {
     public Bishop(Suit suit, Point position) {
         super(ID.BISHOP, suit, position);
     }

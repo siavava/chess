@@ -72,7 +72,7 @@ public abstract class AbstractPiece implements Piece {
     public void setImage() throws IOException {
         String filename = this.getImageFile();
         try {
-            this.image = ImageIO.read(new File((filename)));
+            this.image = ImageIO.read(new File(filename));
         }
         catch(IOException e) {
             System.err.println(e.getMessage());

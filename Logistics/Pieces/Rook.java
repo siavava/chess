@@ -1,7 +1,7 @@
 package Pieces;
 import java.awt.*;
 
-public class Rook extends AbstractPiece {
+public final class Rook extends AbstractPiece {
 
     public Rook(Suit suit, Point position)  {
         super(ID.ROOK, suit, position);

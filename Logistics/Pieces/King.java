@@ -2,7 +2,7 @@ package Pieces;
 
 import java.awt.*;
 
-public class King extends AbstractPiece {
+public final class King extends AbstractPiece {
 
     public King(Suit suit, Point position) {
         super(ID.KING, suit, position);

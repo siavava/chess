@@ -23,8 +23,22 @@ public interface Piece {
     }
 
     enum ID {
-        KING, QUEEN, ROOK,
-        BISHOP, KNIGHT, PAWN
+        KING('K'),
+        QUEEN('Q'),
+        ROOK('R'),
+        BISHOP('B'),
+        KNIGHT('N'),
+        PAWN('P');
+
+        char name;
+
+        ID(char c) {
+            name = c;
+        }
+
+        public String toString() {
+            return String.valueOf(name);
+        }
     }
 
     Point getPosition();
