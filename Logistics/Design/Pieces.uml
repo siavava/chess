@@ -75,7 +75,7 @@
       <point x="39.75" y="116.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic" zoom="0.9508700102354145" showDependencies="false" x="573.5" y="478.5" />
+  <settings layout="Hierarchic" zoom="0.8008700102354145" showDependencies="false" x="574.0" y="767.9942488337913" />
   <SelectedNodes>
     <node>Pieces.Piece</node>
   </SelectedNodes>

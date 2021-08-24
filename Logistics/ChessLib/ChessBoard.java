@@ -23,7 +23,11 @@ public class ChessBoard {
     private final Map<Integer, Cell> cells;
     private Map<Integer, Piece> indexOfPieces;
 
+    // track King positions for easy validation.
+    private int whiteKingPosition, blackKingPosition;
+
     public static class Cell {
+
         private final Point position;
         private Piece occupant = null;
 
@@ -131,6 +135,15 @@ public class ChessBoard {
             Pawn pawn = (Pawn) piece;
             pawn.checkCapture(this, moves);
         }
+    }
+
+    private boolean checkKingProtection(Suit suit) {
+        int pos = switch(suit) {
+            case BLACK -> blackKingPosition;
+            case WHITE -> whiteKingPosition;
+        };
+
+        return true;
     }
 
     private void indexPieces() {
@@ -262,11 +275,11 @@ public class ChessBoard {
         }
     }
 
-    public Cell getCell(Point p) {
+    public Cell getCell(@NotNull Point p) {
         return getCell(p.getX(), p.getY());
     }
 
-    private Cell getCell(Piece p) {
+    private Cell getCell(@NotNull Piece p) {
         return getCell(p.getX(), p.getY());
     }
     public Cell getCell(int ref) {
